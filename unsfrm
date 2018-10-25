@@ -1,0 +1,89 @@
+#!/bin/bash
+# CS375 Project 1
+# Austin Brummett
+# undo safe remove
+
+
+# if no arguments
+if [ $# -eq 0 ]; then
+	echo "This function moves files from $HOME/.trash/"
+	echo "unsfrm [filename] "
+	echo "unsfrm [filename] [directory] "
+	echo "unsfrm [filename] [filename]  "
+	echo "unsfrm [filename] [filename] [directory] "
+	echo "unsfrm [filename]....[filename] [optional directory] "
+	exit 0;
+
+# if 1 argument
+elif [ $# -eq 1 ]; then
+	# check if file exists
+	if [ ! -f "$HOME/.trash/$1" ]; then
+		echo "File does not exist in $HOME/.trash/"
+		break
+	# check if file already exists in working directory
+	elif [ -f $(pwd)/$1 ]; then
+		mv -i $HOME/.trash/$1 $(pwd) # overwrite if yes
+	else # if it exists, move to current working directory
+		mv $HOME/.trash/$1 $(pwd)
+	fi
+		
+# if 2 arguments
+elif [ $# -eq 2 ]; then
+	#check if file exists
+	if [ ! -f "$HOME/.trash/$1" ]; then
+		echo "File does not exist in $HOME/.trash/"
+		break
+	# check if directoy exists
+	elif [ ! -d $2 ]; then
+		echo "$2 is not a valid directory"
+		break
+	elif [[ -f "$1" && -d "$2" ]]; then # if both exist, move the damn file
+		if [ -f "$2/$1" ]; then # check if file already exists
+			mv -i $HOME/.trash/$1 $2 #overwrite
+		else
+			mv $HOME/.trash/$1 $2 # move file
+		fi
+	elif [[ -f "$1" &&  -f "$2" ]]; then # if both files
+		var=0
+		for var in $@; do
+			# check if file in working directory
+			if [ -f "$(pwd)/$var" ]; then
+				mv -i $HOME/.trash/$var $(pwd)
+			else
+				mv $HOME/.trash/$var $(pwd)
+			fi
+			var=var+1
+		done 
+	fi
+# if more than two arguments
+else
+	for last; do true; done
+	
+	if [[ -d "$last" ]]; then
+		path=$last
+		echo $last
+	else # if directory isnt defined
+		path=$(pwd) # current working directory
+	fi
+	var=0
+	base=$HOME/.trash
+	for var in "$@"; do
+		nameNew=$var
+		nameOld=$var
+		# check for file existence
+		if [ ! -f "$base/$var" ]; then
+			echo "$nameNew does not exist in $base"
+			var=var+1
+			continue # keep going
+		fi
+	if [ -f "$path/$var" ]; then
+		# ask if user wants to overwrite
+		mv -i $path/$var $base/$var		
+	else	
+		mv $base/$nameNew $path/$nameNew
+	fi
+	var=var+1
+	done
+fi
+
+

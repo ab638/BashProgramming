@@ -1,0 +1,53 @@
+#!/bin/bash
+# Project 1 CS375
+# Austin Brummett
+# Safe Remove
+
+
+# checks if user has arguments or not
+if [ $# -eq 0 ] 
+then
+	echo "Safe Remove moves files to $HOME/.trash directory"
+	echo "sfrm"
+	echo "sfrm [filename]...[filename]"
+	exit 0;
+fi
+# check if directory does not exist and if there are no symbolic links to directory
+if [[ ! -d "$HOME/.trash" && ! -L "$HOME/.trash/" ]]; then
+	# make directory
+	echo "$HOME/.trash/ does not exist, now creating"
+	mkdir $HOME/.trash
+	echo "$HOME/.trash/ created"
+fi
+	
+var=0
+# testing arguments to see if they are files
+for var in $@
+do
+nameNew="$var" #instance for current  name
+nameOld="$var" #instance for old name
+	# if not a file, ignore it
+	if [  -e $var ]; then
+		echo $nameNew "is a file"
+	else
+		echo $nameNew "is not a file"
+		var=var+1
+		continue # skips this iteration of the loop 
+	fi
+	
+# check if current name is already in the directory
+while [ -f "$HOME/.trash/`basename $nameNew`" ]; do
+	echo "Cannot move file $nameNew; `basename $nameNew` already exists in $HOME/.trash/"
+	# perform a swap, new to old
+	nameOld=$nameNew
+	# get new name
+	read -p "New name to store under: " nameNew
+	mv $nameOld $nameNew # rename file
+done
+	
+mv $nameNew $HOME/.trash # move file
+var=var+1 #iterate
+done
+
+
+	

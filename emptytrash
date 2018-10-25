@@ -1,0 +1,10 @@
+#!/bin/bash
+# CS375 Project 1
+# Austin Brummett
+
+if [ ! "$(ls -A $HOME/.trash/)" ]; then
+	echo "$HOME/.trash/ is empty!"
+else
+	rm -rf $HOME/.trash/*
+	echo "Complete!"
+fi
